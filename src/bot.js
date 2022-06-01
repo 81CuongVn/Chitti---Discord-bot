@@ -7,6 +7,7 @@ const client  = new Discord.Client({intents: ['GUILDS', 'GUILD_MESSAGES']});
 
 client.on('ready', ()=>{
     console.log(`${client.user.tag} has logged in`);
+    client.user.setStatus("online");
 });
 
 
@@ -87,6 +88,12 @@ client.on('channelCreate', channel => {
     client.channels.cache.get(channel.id).send({embeds: [embed]})
     
     console.log(`channel ${channel.name} created`);
+});
+
+
+client.on('disconnected', () => {
+    client.user.setStatus('invisible');
+    console.log(`${client.user.tag} went offline`)
 });
 
 // different functions to process the above used commands
@@ -185,23 +192,31 @@ function detailUser(message, arg){
         return message.reply("Provide a user too");
     if (arg.includes('@'))
         arg = arg.split('@')[1].split('>')[0];
-        if (arg === undefined)
+    if (arg === undefined)
         return message.reply("Provide a user too");
     const member = message.guild.members.cache.get(arg);
-    const img = "../images/"+(Math.floor(Math.random()*10)+1)+".png";
-    const embed = new Discord.MessageEmbed()
-        .setTitle(`Details of user ${member.displayName}`)
-        .setImage(img)
-        .addField("Joined this server at ", `${member.joinedAt}`)
-        .addField("Nickname ", `${member.user}`)
-        .addField("Is kickable? :stuck_out_tongue_closed_eyes: ", `${member.kickable}`)
-        .addField("Highest Role ", `${member.roles.highest.name}`)
-        .addField("Permissions ", `${member.permissions.toArray()}`)
-        .setThumbnail(`${member.user.avatarURL()}`) 
-
+    const img = "https://www.github.com/Gagan1729-droid/Chitti---Discord-bot/tree/master/images/"+(Math.floor(Math.random()*10)+1)+".png";
+    try {
+        const embed = new Discord.MessageEmbed()
+            .setTitle(`Details of user ${member.displayName}`)
+            .setImage(img, img, 300,300)
+            .addField("Joined this server at ", `${member.joinedAt}`)
+            .addField("Nickname ", `${member.user}`)
+            .addField("Is kickable? :stuck_out_tongue_closed_eyes: ", `${member.kickable}`)
+            .addField("Highest Role ", `${member.roles.highest.name}`)
+            .addField("Permissions ", `${member.permissions.toArray()}`)
+            //.addField("Status", `${member.presence.status}`)
+            .setThumbnail(`${member.user.avatarURL()}`) 
+            .setFooter("haha", `${member.user.avatarURL()}`)
+            
         message.channel.send({
-        embeds: [embed],
-    });
+            embeds: [embed]
+        });
+    }
+    catch(err){
+        console.log(err);
+        message.reply("An error occurred  :face_exhaling:");
+    }
 }
 
 client.login(process.env.TOKEN);
