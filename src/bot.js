@@ -50,6 +50,9 @@ client.on("messageCreate", async (message) => {
         else if(CMD_NAME === 'invite'){
             invite_link(message);
         }
+        else if(CMD_NAME === 'details'){
+            detailUser(message, args[0]);
+        }
         else 
             return message.reply("Couldn't find the command. Try again or run '$help'")
     }
@@ -60,6 +63,8 @@ client.on('messageDelete',  (message) => {
     message.channel.send(`Haha! Caught you ${message.author} :full_moon_with_face: \nWhy delted the msg: \"${message.content}\"`)
 });
 
+
+// whenever a channel is created
 client.on('channelCreate', channel => {
     channelType = "unknown";
     if(channel.type==='GUILD_TEXT')
@@ -134,6 +139,7 @@ function help(message, arg){
         .setTitle("Following are the currently available commands: ")
         .setThumbnail(client.user.displayAvatarURL)
         .addField(" \u200B ", "**- ban** : ` ban any user who is causing grave misconduct `")
+        .addField(" \u200B ", "**- details** : ` displays the details of the user `")
         .addField(" \u200B ", "**- hi** : ` say hi to Chitti `")
         .addField(" \u200B ", "**- info** : ` get the server information `")
         .addField(" \u200B ", "**- invite** : ` obtain the invite link for this bot `")
@@ -171,6 +177,30 @@ function info (message, arg){
         .addField("Bot Version", "1.1.3")
     message.channel.send({
         embeds: [embed]
+    });
+}
+
+function detailUser(message, arg){
+    if (arg === undefined)
+        return message.reply("Provide a user too");
+    if (arg.includes('@'))
+        arg = arg.split('@')[1].split('>')[0];
+        if (arg === undefined)
+        return message.reply("Provide a user too");
+    const member = message.guild.members.cache.get(arg);
+    const img = "../images/"+(Math.floor(Math.random()*10)+1)+".png";
+    const embed = new Discord.MessageEmbed()
+        .setTitle(`Details of user ${member.displayName}`)
+        .setImage(img)
+        .addField("Joined this server at ", `${member.joinedAt}`)
+        .addField("Nickname ", `${member.user}`)
+        .addField("Is kickable? :stuck_out_tongue_closed_eyes: ", `${member.kickable}`)
+        .addField("Highest Role ", `${member.roles.highest.name}`)
+        .addField("Permissions ", `${member.permissions.toArray()}`)
+        .setThumbnail(`${member.user.avatarURL()}`) 
+
+        message.channel.send({
+        embeds: [embed],
     });
 }
 
