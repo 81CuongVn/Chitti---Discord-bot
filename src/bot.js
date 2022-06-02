@@ -54,6 +54,18 @@ client.on("messageCreate", async (message) => {
         else if(CMD_NAME === 'details'){
             detailUser(message, args[0]);
         }
+        else if(CMD_NAME === 'getdp'){
+            let arg = args[0];
+            if(arg === undefined || arg.length === 0) return message.reply('Please provide an ID of the user');
+            if (arg.includes('@'))
+                arg = arg.split('@')[1].split('>')[0];
+            const member = message.guild.members.cache.get(arg);
+            const embed = new Discord.MessageEmbed()
+                .setImage(`${member.user.avatarURL()}`)
+                .setFooter(`${member.displayName}`);
+            
+            message.channel.send({embeds: [embed]});
+        }
         else 
             return message.reply("Couldn't find the command. Try again or run '$help'")
     }
@@ -91,7 +103,7 @@ client.on('channelCreate', channel => {
 });
 
 
-client.on('disconnected', () => {
+client.on('disconnect', () => {
     client.user.setStatus('invisible');
     console.log(`${client.user.tag} went offline`)
 });
@@ -147,6 +159,7 @@ function help(message, arg){
         .setThumbnail(client.user.displayAvatarURL)
         .addField(" \u200B ", "**- ban** : ` ban any user who is causing grave misconduct `")
         .addField(" \u200B ", "**- details** : ` displays the details of the user `")
+        .addField(" \u200B ", "**- getdp** : ` displays the profile pic of the user `")
         .addField(" \u200B ", "**- hi** : ` say hi to Chitti `")
         .addField(" \u200B ", "**- info** : ` get the server information `")
         .addField(" \u200B ", "**- invite** : ` obtain the invite link for this bot `")
