@@ -31,16 +31,17 @@ Chitti is preconfigured to work with Heroku's free Dyno service. Setup is as fol
             
        worker node src/bot.js
 <img src = "https://github.com/Gagan1729-droid/Chitti---Discord-bot/blob/master/assets/worker.PNG">
+
 4. Setup GitHub Deployment Method. </br>
   -Connect your forked repository as the deployment method. Automatic deployment from your repostiory is optional, but useful feature. 
-                             
+  
 <img src = "https://github.com/Gagan1729-droid/Chitti---Discord-bot/blob/master/assets/github.PNG">
 
 5. Make changes to your repository to suit your indivdual servers needs. Update/Merge with Chitti---Discord-bot's master branch as needed.
 
 ---
 
-# Contact me
+## Contact me
 
 Connect with me on [discord](www.discordapp.com/users/775777502420402230)
 
