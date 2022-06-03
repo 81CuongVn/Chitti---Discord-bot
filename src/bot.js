@@ -1,9 +1,12 @@
 require('dotenv').config();
 
-const packageJSON = require("../package.json");
+const fs = require('fs')
 const Discord = require('discord.js')
 
-const client  = new Discord.Client({intents: ['GUILDS', 'GUILD_MESSAGES']});
+const client  = new Discord.Client({intents: ['GUILDS', 'GUILD_MESSAGES' , 'GUILD_PRESENCES']});
+client.commands = new Discord.Collection();
+
+const Prefix = '$'
 
 client.on('ready', ()=>{
     console.log(`${client.user.tag} has logged in`);
@@ -11,64 +14,35 @@ client.on('ready', ()=>{
 });
 
 
+fs.readdir("./src/commands/", (err, files) => {
+    if(err) console.log(err);
+    let jsFile = files.filter(f => f.split(".").pop() == "js");
+    if(jsFile.length<=0){
+        console.log("There is no command to load!!");
+        return;
+    }
+    console.log(`Loading ${jsFile.length} commands!`);
+
+    jsFile.forEach((f,i) => {
+        let props = require(`./commands/${f}`);
+        console.log(`${f} command loaded!`);
+        client.commands.set(props.help.name, props);
+    });
+})
+
 // whenever any message is created in the server
 client.on("messageCreate", async (message) => {
     if (message.author.bot) return;
-    msg = message.content;
+    if (!message.content.startsWith(Prefix)) return;
 
     console.log(`[${message.author.tag}]: ${message.content}`);
 
-    // if it starts with $ symbol then its commanded to the bot
-    if(msg.startsWith('$')){
-        const [CMD_NAME, ...args] = msg.trim().substring(1).split(/\s+/);
-        if(CMD_NAME === 'hi'){
-            message.channel.send(`Heyy! This is Chitti, the Robot. \nI can do whatever you wish me to do so
-            \nNice to meet you, ${message.author}`);
-        }
-        else if(CMD_NAME === 'kick'){
-            kick(message, args[0]);
-        }
-        else if(CMD_NAME === 'ban'){
-            ban(message, args[0]);
-        }
-        else if(CMD_NAME ==='status'){
-            const embed = new Discord.MessageEmbed()
-                .setColor('RANDOM')
-                .setTitle("Bot's Live Status")
-                .addField(" \u200B ", "**Channels** : ` " + `${client.channels.cache.size}` + " `")
-                .addField(" \u200B ", "**Servers** : ` " + `${client.guilds.cache.size}` + " `")
-                .addField(" \u200B ", "**Users** : ` " + `${client.users.cache.size}` + " `")
+    let [CMD_NAME, ...args] = message.content.trim().substring(1).split(/\s+/);
+    CMD_NAME = CMD_NAME.toLowerCase();
 
-            message.channel.send({embeds: [embed]});
-            
-        }
-        else if(CMD_NAME === 'help'){
-            help(message, args[0]);
-        }
-        else if(CMD_NAME === 'info'){
-            info(message, args[0]);
-        }
-        else if(CMD_NAME === 'invite'){
-            invite_link(message);
-        }
-        else if(CMD_NAME === 'details'){
-            detailUser(message, args[0]);
-        }
-        else if(CMD_NAME === 'getdp'){
-            let arg = args[0];
-            if(arg === undefined || arg.length === 0) return message.reply('Please provide an ID of the user');
-            if (arg.includes('@'))
-                arg = arg.split('@')[1].split('>')[0];
-            const member = message.guild.members.cache.get(arg);
-            const embed = new Discord.MessageEmbed()
-                .setImage(`${member.user.avatarURL()}`)
-                .setFooter(`${member.displayName}`);
-            
-            message.channel.send({embeds: [embed]});
-        }
-        else 
-            return message.reply("Couldn't find the command. Try again or run '$help'")
-    }
+    let commandFile = client.commands.get(CMD_NAME);
+    if(commandFile) commandFile.run(client, message, args);
+
 });
 
 // whenever a message is deleted
@@ -170,66 +144,6 @@ function help(message, arg){
     message.channel.send({
         embeds: [embed]
     });
-}
-
-
-function invite_link(message) {
-    const link = client.generateInvite({
-        permissions: [
-            Discord.Permissions.FLAGS.ADMINISTRATOR
-        ],
-        scopes: ['bot'],
-      });
-      message.channel.send(`Generated bot invite link: ${link}\nDo share this bot among your friends :hugging:`);
-      
-}
-
-function info (message, arg){
-    let sicon = message.guild.iconURL;
-    let embed = new Discord.MessageEmbed()
-        .setTitle(`${client.user.tag}`)
-        .setColor("#ff0000")
-        .setThumbnail(sicon)
-        .addField("Server Name", message.guild.name+"")
-        .addField("Created On", message.guild.createdAt+"")
-        .addField("You Joined", message.member.joinedAt+"")
-        .addField("Total Members", message.guild.memberCount+"")
-        .addField("Bot Version", "1.1.3")
-    message.channel.send({
-        embeds: [embed]
-    });
-}
-
-function detailUser(message, arg){
-    if (arg === undefined)
-        return message.reply("Provide a user too");
-    if (arg.includes('@'))
-        arg = arg.split('@')[1].split('>')[0];
-    if (arg === undefined)
-        return message.reply("Provide a user too");
-    const member = message.guild.members.cache.get(arg);
-    const img = "https://www.github.com/Gagan1729-droid/Chitti---Discord-bot/tree/master/images/"+(Math.floor(Math.random()*10)+1)+".png";
-    try {
-        const embed = new Discord.MessageEmbed()
-            .setTitle(`Details of user ${member.displayName}`)
-            .setImage(img, img, 300,300)
-            .addField("Joined this server at ", `${member.joinedAt}`)
-            .addField("Nickname ", `${member.user}`)
-            .addField("Is kickable? :stuck_out_tongue_closed_eyes: ", `${member.kickable}`)
-            .addField("Highest Role ", `${member.roles.highest.name}`)
-            .addField("Permissions ", `${member.permissions.toArray()}`)
-            //.addField("Status", `${member.presence.status}`)
-            .setThumbnail(`${member.user.avatarURL()}`) 
-            .setFooter("haha", `${member.user.avatarURL()}`)
-            
-        message.channel.send({
-            embeds: [embed]
-        });
-    }
-    catch(err){
-        console.log(err);
-        message.reply("An error occurred  :face_exhaling:");
-    }
 }
 
 client.login(process.env.TOKEN);

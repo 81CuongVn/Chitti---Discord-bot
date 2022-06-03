@@ -1,0 +1,14 @@
+{
+    "v1.1.0": {
+        "description" : "Original release into the github repository"
+    },
+
+    "v1.1.3": {
+        "description" : "Application released in heroku for public use"
+    },
+
+    "v2.0.1": {
+        "description": "Directory structure updated and made more organized"
+    }
+    
+}
