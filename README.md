@@ -15,8 +15,10 @@ Chitti OAuth Link: [Here](https://discord.com/api/oauth2/authorize?client_id=980
 
 This adds an instance of Chitti with no pre-existing permissions or roles. 
 
+All commands are prefixed by '$' symbol. Just start with '$help' to know about various commands and their functions.
+
 Roles and permissions may be added manually at the discretion of the server administrator.
-As of Chitti v2.0.1 there are no required permissions or roles.
+As of Chitti v2.1.1 there are no required permissions or roles.
 
 ---
 ## Customization
