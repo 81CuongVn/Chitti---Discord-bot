@@ -9,13 +9,14 @@ module.exports.run = async(client, message, args) => {
 
     // GuildMember object
     const member = message.guild.members.cache.get(user.id);
-
-    const img = "https://www.github.com/Gagan1729-droid/Chitti---Discord-bot/tree/master/images/"+(Math.floor(Math.random()*10)+1)+".png";
+    var img = (Math.floor(Math.random()*10)+1)+".png"
+    const file = new Discord.MessageAttachment('./images/'+img)
+    //const img = "https://www.github.com/Gagan1729-droid/Chitti---Discord-bot/tree/master/images/"+img;
 
     try {
         const embed = new Discord.MessageEmbed()
             .setTitle(`Details of user ${user.tag}`)
-            .setImage(img, img, 300,300)
+            .setImage('attachment://'+img)
             .addField("Joined this server at ", `${member.joinedAt}`)
             .addField("Nickname ", `${member.nickname}`)
             .addField("Is kickable? :stuck_out_tongue_closed_eyes: ", `${member.kickable}`)
@@ -26,7 +27,8 @@ module.exports.run = async(client, message, args) => {
             .setFooter(`${user.tag}`, `${member.user.avatarURL()}`)
             
         message.channel.send({
-            embeds: [embed]
+            embeds: [embed],
+            files: [file]
         });
     }
     catch(err) {

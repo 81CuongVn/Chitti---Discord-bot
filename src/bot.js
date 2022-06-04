@@ -2,10 +2,12 @@ require('dotenv').config();
 
 const fs = require('fs')
 const Discord = require('discord.js')
-
-const client  = new Discord.Client({intents: ['GUILDS', 'GUILD_MESSAGES' , 'GUILD_PRESENCES']});
+const Builder = require('@discordjs/builders')
+const wait = require('node:timers/promises').setTimeout;
+const client  = new Discord.Client({intents: ['GUILDS', 'GUILD_MESSAGES' , 'GUILD_PRESENCES', 'DIRECT_MESSAGES' , 'GUILD_VOICE_STATES']});
 client.commands = new Discord.Collection();
 
+const currYear = 2021
 const Prefix = '$'
 
 client.on('ready', ()=>{
@@ -13,7 +15,7 @@ client.on('ready', ()=>{
     client.user.setStatus("online");
 });
 
-
+// to read all the command files present in the folder
 fs.readdir("./src/commands/", (err, files) => {
     if(err) console.log(err);
     let jsFile = files.filter(f => f.split(".").pop() == "js");
@@ -27,8 +29,20 @@ fs.readdir("./src/commands/", (err, files) => {
         let props = require(`./commands/${f}`);
         console.log(`${f} command loaded!`);
         client.commands.set(props.help.name, props);
+
+        // for Autocomplete
+        const commandData = new Builder.SlashCommandBuilder()
+            .setName('autocomplete')
+            .setDescription('Test command to show how autocomplete should be set up')
+            .addStringOption(option =>
+		         option
+                .setName(f.split('.')[0])
+                .setDescription('Name of something')
+                .setAutocomplete(true));
+
     });
 })
+
 
 // whenever any message is created in the server
 client.on("messageCreate", async (message) => {
@@ -45,13 +59,34 @@ client.on("messageCreate", async (message) => {
 
 });
 
+// whenever any interaction is created
+client.on('interactionCreate', async interaction => {
+
+    // When there is a menu selection interaction
+    if(interaction.customId === 'YrOfBirth') {
+        if(interaction.replied) return interaction.reply(`Heyy, ${interaction.member.displayName}, you can reply only once :)`)
+        var year = currYear - parseInt(interaction.values[0])
+        interaction.reply(`Woahh! ${interaction.member.displayName}, you are ${year} years old!`);
+    }
+
+    // When there is a autocomple interaction
+    if (interaction.commandName === 'autocomplete') {
+		const focusedValue = interaction.options.getFocused();
+		const choices = ['faq', 'install', 'collection', 'promise', 'debug'];
+		const filtered = choices.filter(choice => choice.startsWith(focusedValue));
+		const response = await interaction.respond(
+			filtered.map(choice => ({ name: choice, value: choice })),
+		);
+	}
+});
+
 // whenever a message is deleted
 client.on('messageDelete',  (message) => {
     message.channel.send(`Haha! Caught you ${message.author} :full_moon_with_face: \nWhy delted the msg: \"${message.content}\"`)
 });
 
 
-// whenever a channel is created
+// whenever a new channel is created
 client.on('channelCreate', channel => {
     channelType = "unknown";
     if(channel.type==='GUILD_TEXT')
@@ -82,69 +117,6 @@ client.on('disconnect', () => {
     console.log(`${client.user.tag} went offline`)
 });
 
-// different functions to process the above used commands
-function kick(message, arg){
-    if(!message.member.permissions.has('KICK_MEMBERS'))
-        return message.reply("You do not have the permission to use that command");
-
-    if(arg === undefined || arg.length === 0) return message.reply('Please provide an ID of the user');
-
-    if (arg.includes('@')){
-        arg = arg.split('@')[1].split('>')[0];
-    }
-    
-    const member = message.guild.members.cache.get(arg);
-    if(!member) return message.reply("Member not found");
-
-    try { 
-        const user = message.guild.members.kick(arg);
-        message.channel.send(`${user} kicked successfully! `);
-    }
-    catch(err){
-        console.log(err);
-        message.channel.send("I don't have the permission :(");
-    }
-}
-
-function ban(message, arg){
-    if(!message.member.permissions.has('BAN_MEMBERS'))
-        return message.reply("You do not have the permission to use that command");
-    
-    if(arg === undefined || arg.length === 0) return message.reply('Please provide an ID of the user');
-    if (arg.includes('@'))
-        arg = arg.split('@')[1].split('>')[0];
-    
-    const member = message.guild.members.cache.get(arg);
-    if(!member) return message.reply("Member not found");
-    try { 
-        const user = message.guild.members.ban(arg);
-        message.channel.send(`${user} banned successfully! `);
-    }
-    catch(err){
-        console.log(err);
-        message.channel.send("I don't have the permission :(");
-    }
-}
-
-function help(message, arg){
-    const embed = new Discord.MessageEmbed()
-        .setColor("RANDOM")
-        .setTitle("Following are the currently available commands: ")
-        .setThumbnail(client.user.displayAvatarURL)
-        .addField(" \u200B ", "**- ban** : ` ban any user who is causing grave misconduct `")
-        .addField(" \u200B ", "**- details** : ` displays the details of the user `")
-        .addField(" \u200B ", "**- getdp** : ` displays the profile pic of the user `")
-        .addField(" \u200B ", "**- hi** : ` say hi to Chitti `")
-        .addField(" \u200B ", "**- info** : ` get the server information `")
-        .addField(" \u200B ", "**- invite** : ` obtain the invite link for this bot `")
-        .addField(" \u200B ", "**- kick** : ` kick any user who isn't maintaining decorum `")
-        .addField(" \u200B ", "**- status** : ` get the current status of the bot `")
-
-    message.channel.send("Don't worry! I am here to help you if you are facing any probs :)")
-    message.channel.send({
-        embeds: [embed]
-    });
-}
 
 client.login(process.env.TOKEN);
  

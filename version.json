@@ -9,6 +9,14 @@
 
     "v2.0.1": {
         "description": "Directory structure updated and made more organized"
+    },
+
+    "v2.0.2": {
+        "description": "Minor changes"
+    },
+
+    "v2.1.1": {
+        "description": "Help command added and interactions created"
     }
     
 }
