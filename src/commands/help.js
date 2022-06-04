@@ -10,7 +10,7 @@ module.exports.run = async(client, message, args) => {
 
         let embed = new Discord.MessageEmbed()
                 .setColor("RANDOM")
-                .setTitle("Following are the currently available commands: ")
+                .setTitle("Here's a list of currently available commands: ")
                 .setThumbnail(client.user.displayAvatarURL());
             
          // embed all the commands 
@@ -19,9 +19,18 @@ module.exports.run = async(client, message, args) => {
             embed.addField(" \u200B ", "**- " + props.help.name +"** : " + props.help.description);
         });
 
+        const image_button = new Discord.MessageActionRow()
+                .addComponents(
+                    new Discord.MessageButton()
+                        .setCustomId('help_image_commands')
+                        .setLabel('Image Commands')
+                        .setStyle('SECONDARY')
+                );
+
         message.channel.send({
             content: "Don't worry! I am here to help you if you are facing any probs :)\n",
-            embeds: [embed]
+            embeds: [embed],
+            components: [image_button]
         })
     })
     

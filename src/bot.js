@@ -23,7 +23,7 @@ fs.readdir("./src/commands/", (err, files) => {
         console.log("There is no command to load!!");
         return;
     }
-    console.log(`Loading ${jsFile.length} commands!`);
+    console.log(`.....Loading ${jsFile.length} commands!`);
 
     jsFile.forEach((f,i) => {
         let props = require(`./commands/${f}`);
@@ -41,6 +41,27 @@ fs.readdir("./src/commands/", (err, files) => {
                 .setAutocomplete(true));
 
     });
+})
+
+
+// Embed for help-image-command button
+var help_image_commands_embed = new Discord.MessageEmbed()
+                    .setTitle('Image commands')
+                    .setColor('RANDOM');
+
+
+// Read image commands
+fs.readdir("./src/commands/image-commands/", (err, files) => {
+    if(err) console.log(err);
+    let jsFile = files.filter(f => f.split(".").pop() == "js");
+    console.log(`.....Loading ${jsFile.length} image commands!`);
+    
+    jsFile.forEach((f,i) => {
+        let props = require(`./commands/image-commands/${f}`)
+        console.log(`${f} command loaded!`);
+        client.commands.set(props.help.name, props);
+        help_image_commands_embed.addField(" \u200B ", "**- " + props.help.name +"** : " + props.help.description);
+    })
 })
 
 
@@ -78,6 +99,15 @@ client.on('interactionCreate', async interaction => {
 			filtered.map(choice => ({ name: choice, value: choice })),
 		);
 	}
+
+    //When image_help button is clicked
+    if(interaction.customId === 'help_image_commands') {
+        interaction.update({
+            content: 'yeahh',
+            embeds: [help_image_commands_embed],
+            components: []
+        });
+    }
 });
 
 // whenever a message is deleted
