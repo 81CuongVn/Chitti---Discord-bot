@@ -36,6 +36,27 @@ module.exports.run = async(client, message, args) => {
     
 }
 
+// When image help button is clicked
+module.exports.run_image = async(client, interaction) => {
+    fs.readdir("./src/commands/image-commands/", (err, files) => {
+        if(err) console.log(err);
+        let jsFile = files.filter(f => f.split(".").pop() == "js");
+
+        var help_image_commands_embed = new Discord.MessageEmbed()
+                    .setTitle('Image commands')
+                    .setColor('RANDOM');
+
+        jsFile.forEach(f => {
+            let props = require(`./image-commands/${f}`);
+            help_image_commands_embed.addField(" \u200B ", "**- " + props.help.name +"** : " + props.help.description);
+        })
+        interaction.update({
+            embeds: [help_image_commands_embed],
+            components: []
+        });
+    })
+}
+
 module.exports.help = {
     name: "help",
     description: "Get the list of commands along with their info"

@@ -44,12 +44,6 @@ fs.readdir("./src/commands/", (err, files) => {
 })
 
 
-// Embed for help-image-command button
-var help_image_commands_embed = new Discord.MessageEmbed()
-                    .setTitle('Image commands')
-                    .setColor('RANDOM');
-
-
 // Read image commands
 fs.readdir("./src/commands/image-commands/", (err, files) => {
     if(err) console.log(err);
@@ -60,7 +54,6 @@ fs.readdir("./src/commands/image-commands/", (err, files) => {
         let props = require(`./commands/image-commands/${f}`)
         console.log(`${f} command loaded!`);
         client.commands.set(props.help.name, props);
-        help_image_commands_embed.addField(" \u200B ", "**- " + props.help.name +"** : " + props.help.description);
     })
 })
 
@@ -102,11 +95,7 @@ client.on('interactionCreate', async interaction => {
 
     //When image_help button is clicked
     if(interaction.customId === 'help_image_commands') {
-        interaction.update({
-            content: 'yeahh',
-            embeds: [help_image_commands_embed],
-            components: []
-        });
+        client.commands.get('help').run_image(client, interaction);
     }
 });
 

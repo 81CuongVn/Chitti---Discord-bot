@@ -2,7 +2,6 @@ const Discord = require('discord.js')
 const DIG = require('discord-image-generation')
 
 module.exports.run = async(client, message, args) => {
-
     let user = ''
     if(!args[0]) user = message.author;
     else {
@@ -11,17 +10,14 @@ module.exports.run = async(client, message, args) => {
     }
     let avatar = user.displayAvatarURL({ dynamic: false, format: 'png' });
 
-    let img = await new DIG.Blur().getImage(avatar)
-    
-    // Add the image as an attachment
-    let embed = new Discord.MessageEmbed()
-        .setTitle("Blur")
-        .setImage("attachment://blur.png")
-    let attach = new Discord.MessageAttachment(img, "blur.png");;
-    message.channel.send({ embed: embed, files: [attach]})
+    let img = await new DIG.Triggered().getImage(avatar)
+
+    // Add the image as an attachement
+    let attach = new Discord.MessageAttachment(img, "triggered.png");;
+    message.channel.send({ files: [attach] })
 }
 
 module.exports.help = {
-    name: "blur",
-    description: "Blurrify the image :smile:"
+    name: "triggered",
+    description: "Make your image triggered :zap: :zap:"
 }

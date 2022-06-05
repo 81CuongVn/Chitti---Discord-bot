@@ -21,6 +21,14 @@
 
     "v2.2.1": {
         "description": "Image commands are added and they are also included in help command in form of a button"
+    },
+
+    "v2.2.2": {
+        "description": "More fun commands added to the bot"
+    },
+    
+    "v2.2.3": {
+        "description": "Different commands added which work from the external api libraries"
     }
     
 }

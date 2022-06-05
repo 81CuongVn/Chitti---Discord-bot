@@ -1,0 +1,21 @@
+const Discord = require('discord.js')
+const DIG = require('discord-image-generation')
+
+module.exports.run = async(client, message, args) => {
+    let user = ''
+    if(!message.mentions.users.first()) user = message.author
+    else user = message.mentions.users.first();
+    
+    let avatar = user.displayAvatarURL({ dynamic: false, format: 'png' });
+
+    let img = await new DIG.Tatoo().getImage(avatar)
+
+    // Add the image as an attachement
+    let attach = new Discord.MessageAttachment(img, "tatoo.png");;
+    message.channel.send({ files: [attach] })
+}
+
+module.exports.help = {
+    name: "tatoo",
+    description: "fun command! Mention any user or leave it empty if you want yourselves in that place"
+}
