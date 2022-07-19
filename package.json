@@ -13,7 +13,7 @@
   "dependencies": {
     "@discordjs/builders": "^0.13.0",
     "@discordjs/rest": "^0.4.1",
-    "@discordjs/voice": "^0.9.0",
+    "@discordjs/voice": "^0.11.0",
     "discord-api-types": "^0.33.2",
     "discord-image-generation": "^1.4.13",
     "discord.js": "^13.7.0",
